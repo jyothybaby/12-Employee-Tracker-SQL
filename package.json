@@ -1,0 +1,25 @@
+{
+  "name": "12-employee-tracker-sql",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jyothybaby/12-Employee-Tracker-SQL.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jyothybaby/12-Employee-Tracker-SQL/issues"
+  },
+  "homepage": "https://github.com/jyothybaby/12-Employee-Tracker-SQL#readme",
+  "dependencies": {
+    "express": "^4.17.1",
+    "inquirer": "^8.1.2",
+    "mysql2": "^2.3.0"
+  }
+}
