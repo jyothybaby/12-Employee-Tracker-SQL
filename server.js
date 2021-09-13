@@ -9,7 +9,7 @@ const app = express();
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 //Connecting to the Database
-const db = mysql.createConnection (
+const db = mysql.createConnection(
   {
     host: 'localhost',
     user: 'root',
@@ -22,40 +22,43 @@ const db = mysql.createConnection (
 function init() {
   mainPrompt();
 }
-function mainPrompt () {
-inquirer.prompt ([{
-    type:"list",
+function mainPrompt() {
+  inquirer.prompt([{
+    type: "list",
     name: "mainChoice",
-    message :"What would like to do?",
+    message: "What would like to do?",
     choices: ["View all Employees",
-               "Add Employee",
-               "Update Employee Role",
-                "View All Roles",
-                "Add Role",
-              "View All Departments",
-              "Add Department",
-              "Quit"]
+      "Add Employee",
+      "Update Employee Role",
+      "View All Roles",
+      "Add Role",
+      "View All Departments",
+      "Add Department",
+      "Quit"]
   }
-]).then ((userChoice)=>{
-  switch(userChoice.mainChoice) {
-    case "View all Employees": viewAllEmployee();
-    break;
-    case "Add Employee": addEmployee();
-    break;
-    case "Update Employee Role": updateEmpRole();
-    break;
-    case "View All Roles" : viewAllRoles();
-    break;
-    case "Add Role": addRole();
-    break;
-    case "View All Department" : viewAllDept();
-    break;
-    case "Add Department": addDept();
-    default: quit()
+  ]).then((userChoice) => {
+    switch (userChoice.mainChoice) {
+      case "View all Employees": viewAllEmployee();
+        break;
+      case "Add Employee": addEmployee();
+        break;
+      case "Update Employee Role": updateEmpRole();
+        break;
+      case "View All Roles": viewAllRoles();
+        break;
+      case "Add Role": addRole();
+        break;
+      case "View All Department": viewAllDept();
+        break;
+      case "Add Department": addDept();
+      default: quit()
 
-  }
-})
+    }
+  })
 
 }
 
+function viewAllEmployee() {
+  
+}
 init();
