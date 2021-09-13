@@ -22,6 +22,7 @@ const db = mysql.createConnection(
 function init() {
   mainPrompt();
 }
+
 function mainPrompt() {
   inquirer.prompt([{
     type: "list",
@@ -59,6 +60,16 @@ function mainPrompt() {
 }
 
 function viewAllEmployee() {
-  
+  db.query(`SELECT * from employee`, function(err,result){
+    if(err){
+      console.log(err);
+    }
+    console.table(result);
+    mainPrompt();
+  });
 }
+app.use((req, res) => {
+  res.status(404).end();
+});
+
 init();
