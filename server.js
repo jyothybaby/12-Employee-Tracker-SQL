@@ -2,6 +2,7 @@
 const express = require('express');
 const mysql = require('mysql2');
 const inquirer = require("inquirer");
+// const Connection = require('mysql2/typings/mysql/lib/Connection');
 
 const PORT = process.env.PORT || 3001;
 const app = express();
@@ -18,6 +19,8 @@ const db = mysql.createConnection(
   },
   console.log(`Connected to the employeetracker_db database.`)
 );
+const empDept = db.query(`SELECT * FROM department`)
+const empRole = db.query(`SELECT title FROM role`)
 
 function init() {
   mainPrompt();
@@ -52,7 +55,9 @@ function mainPrompt() {
       case "View All Department": viewAllDept();
         break;
       case "Add Department": addDept();
-      default: quit()
+        break;
+      case "Quit": db.end();
+        break;
 
     }
   })
@@ -60,8 +65,14 @@ function mainPrompt() {
 }
 
 function viewAllEmployee() {
-  db.query(`SELECT * from employee`, function(err,result){
-    if(err){
+  db.query(`SELECT A.id, C.first_name, C.last_name, B.title, A.name as department, B.salary, C.manager_id 
+  FROM department as A
+  INNER JOIN role as B
+  ON A.id = B.department_id 
+  INNER JOIN employee as C
+  ON B.id = C.role_id
+  `, function (err, result) {
+    if (err) {
       console.log(err);
     }
     console.table(result);
@@ -71,5 +82,37 @@ function viewAllEmployee() {
 app.use((req, res) => {
   res.status(404).end();
 });
+
+function addEmployee() {
+
+ inquirer.prompt([{
+    type: "input",
+    name: "employeeFirstName",
+    message: "What is employee's first Name?"
+  },
+  {
+    type: "input",
+    name: "employeeLastName",
+    message: "What is employee's last Name?"
+  },
+  {
+    type: "list",
+    name: "employeeRole",
+    message: "What is employee's role?",
+    choices: empRole,
+  },
+    {
+    type: "list",
+    name: "employeeDepartment",
+    message: "What is employee's department?",
+    choices: empDept,
+  },
+
+  ]) .then((answers) => {
+
+    const addempSql = ``
+
+  })
+}
 
 init();
