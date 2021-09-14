@@ -1,10 +1,10 @@
 -- View employee
 
-A = department
-B = role
-C = employee
+-- A = department
+-- B = role
+-- C = employee
 
-SELECT A.id, C.first_name, C.last_name, B.title, A.name, B.salary, C.manager_id 
+SELECT A.id as ID, C.first_name, C.last_name, B.title, A.name as Department, B.salary, CONCAT(C.first_name, " ", C.last_name) as Manager
 FROM department as A
 INNER JOIN role as B
 ON A.id = B.department_id 
