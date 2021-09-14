@@ -19,8 +19,41 @@ const db = mysql.createConnection(
   },
   console.log(`Connected to the employeetracker_db database.`)
 );
-const empDept = db.query(`SELECT * FROM department`)
-const empRole = db.query(`SELECT title FROM role`)
+
+//---------------------------------------------------------------------------------
+//const empDept = [db.query(`SELECT name FROM department`)];
+//console.log(empDept);
+
+// const empDept = {};
+
+// db.query(`SELECT id as value, name FROM department`, (err, rows) => {
+//   if(err){
+//     console.log('Error while fetching department data');
+//     return;
+//   }
+//    console.table(rows);
+  // for(let index = 0; index < rows.length; index++){
+  //   console.log(rows[index].id + ' ' + rows[index].name);
+  // }
+
+//   inquirer.prompt([{
+//     type: "list",
+//     name: "deptChoice",
+
+//     message: "Select Department?",
+//     choices: rows
+//   }]).then((selectedDept)=>{
+//     const ress = choices.find(function(row,index){
+//      if(row.name == selectedDept.deptChoice)
+//       return true; 
+//     });
+//     console.log(ress);
+//   });
+  
+// });
+
+//--------------------------------------------------------------------------------
+const empRole = [db.query(`SELECT title FROM role`)];
 
 function init() {
   mainPrompt();
@@ -31,28 +64,31 @@ function mainPrompt() {
     type: "list",
     name: "mainChoice",
     message: "What would like to do?",
-    choices: ["View all Employees",
-      "Add Employee",
-      "Update Employee Role",
+    choices: ["View All Departments",
       "View All Roles",
-      "Add Role",
-      "View All Departments",
+      "View All Employees",
       "Add Department",
+      "add a role",
+      "add an employee",
+      "update an employee role",
       "Quit"]
+
+
+      
   }
   ]).then((userChoice) => {
     switch (userChoice.mainChoice) {
       case "View all Employees": viewAllEmployee();
         break;
-      case "Add Employee": addEmployee();
+      case "add an employee": addEmployee();
         break;
-      case "Update Employee Role": updateEmpRole();
+      case "update an employee role": updateEmpRole();
         break;
       case "View All Roles": viewAllRoles();
         break;
-      case "Add Role": addRole();
+      case "add a role": addRole();
         break;
-      case "View All Department": viewAllDept();
+      case "View All Departments": viewAllDept();
         break;
       case "Add Department": addDept();
         break;
@@ -82,6 +118,21 @@ function viewAllEmployee() {
 app.use((req, res) => {
   res.status(404).end();
 });
+
+//View All Department
+function viewAllDept() {
+  db.query(`SELECT id, name as department FROM department`, function (err, result) {
+    if (err) {
+      console.log(err);
+    }
+    console.table(result);
+    mainPrompt();
+  });
+}
+app.use((req, res) => {
+  res.status(404).end();
+});
+
 
 function addEmployee() {
 
