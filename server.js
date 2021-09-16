@@ -2,6 +2,7 @@
 const express = require('express');
 const mysql = require('mysql2');
 const inquirer = require("inquirer");
+
 // const Connection = require('mysql2/typings/mysql/lib/Connection');
 
 const PORT = process.env.PORT || 3001;
@@ -53,7 +54,7 @@ function mainPrompt() {
         break;
       case "add a role": addRole();
         break;
-      case  "View All Employees": viewAllEmployee();
+      case "View All Employees": viewAllEmployee();
         break;
       case "Add Department": addDept();
         break;
@@ -79,12 +80,7 @@ function viewAllDept() {
 //  Function for viewing all roles
 
 function viewAllRoles() {
-  db.query(`SELECT B.title as Title, C.role_id, A.name as department,B.salary
-  FROM role as B
-  INNER JOIN department as A
-  ON A.id = department_id
-  INNER JOIN employee as C
-  ON B.id = C.role_id `, function (err, result) {
+  db.query(`SELECT * FROM role `, function (err, result) {
     if (err) {
       console.log(err);
     }
@@ -104,7 +100,7 @@ function viewAllEmployee() {
   LEFT JOIN employee m
 	ON m.id = e.manager_id` ;
 
-  db.query(sqlQuery, function(err,res) {
+  db.query(sqlQuery, function (err, res) {
     if (err) {
       console.log(err);
     }
@@ -121,17 +117,77 @@ function addDept() {
     name: "dept",
     message: "Enter the Name of the department? "
   }
-  ]).then ((answer)=> {
+  ]).then((answer) => {
     let deptName = answer.dept;
     console.log(deptName);
-    db.query(`INSERT INTO department (name) VALUES ('${deptName}')`,(err, result)=> {
+    db.query(`INSERT INTO department (name) VALUES ('${deptName}')`, (err, result) => {
       if (err) {
         console.log(err);
       }
       console.log(result);
-
+      mainPrompt();
     })
   })
+
+}
+// For adding Role
+function addRole() {
+  var query =
+    `SELECT id , name FROM department`
+  db.query(query, function (err, res) {
+    if (err) {
+      console.log('Error while fetching department data');
+      return;
+    }
+    //console.table(res);
+
+    const empdept = [];
+    for (let index = 0; index < res.length; index++) {
+      empdept.push(res[index].id + ' ' + res[index].name);
+      
+    }
+    //console.log(empdept);
+    promptForAddingRole(empdept)
+  })
+}
+function promptForAddingRole(empdept) {
+  inquirer.prompt([
+    {
+      type: "input",
+      name: "role",
+      message: "Enter Name of the role?"
+    },
+    {
+      type: "input",
+      name: "salary",
+      message: "Enter the salary :?"
+    },
+    {
+      type: "list",
+      name: "dept",
+      message: "Enter Name department ?",
+      choices: empdept,
+    },
+  ]).then((answer) => {
+    let newRole = answer.role;
+    let newSalary = answer.salary;
+    let dept = answer.dept;
+    let dept1 = dept.slice(0,1);
+    console.log(newRole);
+    console.log(newSalary);
+    console.log(dept1);
+  
+    db.query(`INSERT INTO role (title,salary,department_id) VALUES ('${newRole}', '${newSalary}','${dept1}')`, (err, result) => {
+      if (err) {
+        console.log(err);
+      }
+      console.log("ROW added sucessfully");
+      //console.table(result);
+    mainPrompt();
+    })
+   
+  })
+
 
 }
 
@@ -174,35 +230,5 @@ init();
 
 
 
-//---------------------------------------------------------------------------------
-//const empDept = [db.query(`SELECT name FROM department`)];
-//console.log(empDept);
 
-// const empDept = {};
-
-// db.query(`SELECT id as value, name FROM department`, (err, rows) => {
-//   if(err){
-//     console.log('Error while fetching department data');
-//     return;
-//   }
-//    console.table(rows);
-// for(let index = 0; index < rows.length; index++){
-//   console.log(rows[index].id + ' ' + rows[index].name);
-// }
-
-//   inquirer.prompt([{
-//     type: "list",
-//     name: "deptChoice",
-
-//     message: "Select Department?",
-//     choices: rows
-//   }]).then((selectedDept)=>{
-//     const ress = choices.find(function(row,index){
-//      if(row.name == selectedDept.deptChoice)
-//       return true; 
-//     });
-//     console.log(ress);
-//   });
-
-// });
 
