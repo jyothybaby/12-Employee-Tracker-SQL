@@ -130,6 +130,8 @@ function addDept() {
   })
 
 }
+
+
 // For adding Role
 function addRole() {
   var query =
@@ -187,12 +189,42 @@ function promptForAddingRole(empdept) {
     })
    
   })
-
-
 }
+
 
 function addEmployee() {
 
+  var query1= `SELECT department_id , title FROM role`
+  db.query(query1, function (err, res) {
+    if (err) {
+      console.log('Error while fetching role data');
+      return;
+    }
+    var empRole = [];
+    for (let index = 0; index < res.length; index++) {
+      empRole.push(res[index].department_id + ' ' + res[index].title);
+      }
+      console.log(empRole)
+  
+  var query2= `SELECT  manager_id , first_name, last_name FROM employee`
+  db.query(query2, function (err, res) {
+    if (err) {
+      console.log('Error while fetching role data');
+      return;
+    }
+    var empMngr = [];
+    for (let index = 0; index < res.length; index++) {
+      empMngr.push(res[index].manager_id + ' ' + res[index].first_name + ' '+ res[index].last_name);
+      }
+      console.log(empMngr)
+  
+ promptForAddingRole(empRole,empMngr)
+ 
+});
+});
+}
+
+function promptForAddingRole(empRole) {
   inquirer.prompt([{
     type: "input",
     name: "employeeFirstName",
@@ -209,11 +241,11 @@ function addEmployee() {
     message: "What is employee's role?",
     choices: empRole,
   },
-  {
+   {
     type: "list",
-    name: "employeeDepartment",
-    message: "What is employee's department?",
-    choices: empDept,
+    name: "employeeManager",
+    message: "Who is employee's Manager?",
+    choices: empMngr,
   },
 
   ]).then((answers) => {
@@ -221,7 +253,41 @@ function addEmployee() {
     const addempSql = ``
 
   })
+
 }
+
+
+  
+
+  // inquirer.prompt([{
+  //   type: "input",
+  //   name: "employeeFirstName",
+  //   message: "What is employee's first Name?"
+  // },
+  // {
+  //   type: "input",
+  //   name: "employeeLastName",
+  //   message: "What is employee's last Name?"
+  // },
+  // {
+  //   type: "list",
+  //   name: "employeeRole",
+  //   message: "What is employee's role?",
+  //   choices: empRole,
+  // },
+  //  {
+  //   type: "list",
+  //   name: "employeeManager",
+  //   message: "Who is employee's Manager?",
+  //   choices: empMngr,
+  // },
+
+  // ]).then((answers) => {
+
+  //   const addempSql = ``
+
+  // })
+
 app.use((req, res) => {
   res.status(404).end();
 });
