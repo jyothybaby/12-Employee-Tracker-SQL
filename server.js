@@ -202,11 +202,11 @@ function addEmployee() {
     }
     var empRole = [];
     for (let index = 0; index < res.length; index++) {
-      empRole.push(res[index].department_id + ' ' + res[index].title);
+      empRole.push(res[index].title);
       }
       console.log(empRole)
   
-  var query2= `SELECT  manager_id , first_name, last_name FROM employee`
+  var query2= `SELECT  id , first_name, last_name FROM employee`
   db.query(query2, function (err, res) {
     if (err) {
       console.log('Error while fetching role data');
@@ -214,7 +214,7 @@ function addEmployee() {
     }
     var empMngr = [];
     for (let index = 0; index < res.length; index++) {
-      empMngr.push(res[index].manager_id + ' ' + res[index].first_name + ' '+ res[index].last_name);
+      empMngr.push(res[index].first_name + ' '+ res[index].last_name);
       }
       console.log(empMngr)
   
@@ -224,8 +224,9 @@ function addEmployee() {
 });
 }
 
-function promptForAddingRole(empRole) {
-  inquirer.prompt([{
+function promptForAddingRole(empRole,empMngr) {
+   inquirer.prompt([
+     {
     type: "input",
     name: "employeeFirstName",
     message: "What is employee's first Name?"
@@ -250,43 +251,39 @@ function promptForAddingRole(empRole) {
 
   ]).then((answers) => {
 
-    const addempSql = ``
+    let newEmpFName = answers.employeeFirstName;
+    let newEmpLName = answers.employeeLastName;
+    console.log("Employee Manager is ", answers.employeeManager);
+    db.query(`SELECT department_id FROM role WHERE title = ('${answers.employeeRole}')`,(err, result) =>{
+      if (err) {
+        console.log(err);
+      }
+      
+      var newEmpRole_id = result; 
+      console.log(newEmpRole_id);
+    } );
+
+    db.query(`SELECT id FROM employee WHERE concat(first_name, " ", last_name) = ('${answers.employeeManager}')`,(err, result) => {
+      if (err) {
+        console.log(err);
+      }
+      console.log(result);
+      var newMgrRole_id = result; 
+      console.log(newMgrRole_id);
+    } );
+db.query(`INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES ('${newEmpFName}', '${newEmpLName}', '${newEmpRole_id}', '${newMgrRole_id}')`, (err, result) => {
+  if (err) {
+    console.log(err);
+  }
+  console.log("ROW added sucessfully");
+  //console.table(result);
+mainPrompt();
+})
 
   })
 
 }
 
-
-  
-
-  // inquirer.prompt([{
-  //   type: "input",
-  //   name: "employeeFirstName",
-  //   message: "What is employee's first Name?"
-  // },
-  // {
-  //   type: "input",
-  //   name: "employeeLastName",
-  //   message: "What is employee's last Name?"
-  // },
-  // {
-  //   type: "list",
-  //   name: "employeeRole",
-  //   message: "What is employee's role?",
-  //   choices: empRole,
-  // },
-  //  {
-  //   type: "list",
-  //   name: "employeeManager",
-  //   message: "Who is employee's Manager?",
-  //   choices: empMngr,
-  // },
-
-  // ]).then((answers) => {
-
-  //   const addempSql = ``
-
-  // })
 
 app.use((req, res) => {
   res.status(404).end();
