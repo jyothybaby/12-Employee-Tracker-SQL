@@ -3,7 +3,6 @@ const express = require('express');
 const mysql = require('mysql2');
 const inquirer = require("inquirer");
 
-// const Connection = require('mysql2/typings/mysql/lib/Connection');
 
 const PORT = process.env.PORT || 3001;
 const app = express();
@@ -34,13 +33,13 @@ function mainPrompt() {
     name: "mainChoice",
     message: "What would like to do?",
     choices: ["View All Departments",
-      "View All Roles",
-      "View All Employees",
-      "Add Department",
-      "add a role",
-      "add an employee",
-      "update an employee role",
-      "Quit"]
+              "View All Roles",
+              "View All Employees",
+              "Add Department",
+              "add a role",
+              "add an employee",
+              "update an employee role",
+              "Quit"]
   }
   ]).then((userChoice) => {
     switch (userChoice.mainChoice) {
@@ -298,6 +297,45 @@ function promptForAddingEmployee(empRole, empMngr) {
   })
 
 }
+
+function updateEmpRole() {
+
+  var query1 = `SELECT first_name, last_name, FROM employee `
+  db.query(query1, function (err, res) {
+    if (err) {
+      console.log('Error while fetching  data');
+      return;
+    }
+    var empName = [];
+    for (let index = 0; index < res.length; index++) {
+      empName.push(res[index].title);
+    }
+    console.log(empName);
+
+    var query2 = `SELECT title FROM role`
+    db.query(query2, function (err, result) {
+      if (err) {
+        console.log('Error while fetching role data');
+        return;
+      }
+      var empRole = [];
+      for (let index = 0; index < result.length; index++) {
+        empRole.push(result[index].title);
+      }
+      console.log(empRole);
+
+      promptForUpdatingEmployeeRole(empName, empRole);
+
+    })
+
+  })
+
+}
+
+ function promptForUpdatingEmployeeRole(empName, empRole) {
+
+}
+
 
 
 
