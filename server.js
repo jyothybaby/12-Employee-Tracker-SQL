@@ -66,10 +66,7 @@ function mainPrompt() {
 }
 // Function for viewing All Department
 function viewAllDept() {
-  db.query(`SELECT B.id,B.title,B.salary,A.name AS Department,B.Department_id 
-            FROM department AS A 
-            JOIN role AS B 
-            ON A.id = B.department_id;`, function (err, result) {
+  db.query(`SELECT * FROM department`, function (err, result) {
     if (err) {
       console.log(err);
     }
@@ -82,7 +79,10 @@ function viewAllDept() {
 //  Function for viewing all roles
 
 function viewAllRoles() {
-  db.query(`SELECT * FROM role `, function (err, result) {
+  db.query(`SELECT A.id, A.title, A.salary, B.name AS Department, A.department_id
+            FROM role AS A
+            JOIN department as B
+            ON A.department_id = B.id `, function (err, result) {
     if (err) {
       console.log(err);
     }
@@ -126,7 +126,7 @@ function addDept() {
       if (err) {
         console.log(err);
       }
-      console.log(result);
+      console.log("DEPARTMENT Added sucessfully!!");
       mainPrompt();
     })
   })
@@ -176,17 +176,17 @@ function promptForAddingRole(empdept) {
     let newRole = answer.role;
     let newSalary = answer.salary;
     let dept = answer.dept;
-    console.log(newRole);
-    console.log(newSalary);
-    console.log(dept);
+    //console.log(newRole);
+    //console.log(newSalary);
+    //console.log(dept);
     db.query(`SELECT id FROM department WHERE name = ('${answer.dept}')`, (err, result) => {
       if (err) {
         console.log(err);
       }
 
-      console.log(result);
+      //console.log(result);
       const deptid = result[0].id;
-      console.log(deptid);
+     // console.log(deptid);
 
 
 
@@ -215,7 +215,7 @@ function addEmployee() {
     for (let index = 0; index < res.length; index++) {
       empRole.push(res[index].title);
     }
-    console.log(empRole)
+   //console.log(empRole)
 
     var query2 = `SELECT  id , first_name, last_name FROM employee`
     db.query(query2, function (err, res) {
@@ -227,7 +227,7 @@ function addEmployee() {
       for (let index = 0; index < res.length; index++) {
         empMngr.push(res[index].first_name + ' ' + res[index].last_name);
       }
-      console.log(empMngr)
+      //console.log(empMngr)
 
       promptForAddingEmployee(empRole, empMngr)
 
@@ -264,23 +264,23 @@ function promptForAddingEmployee(empRole, empMngr) {
 
     let newEmpFName = answers.employeeFirstName;
     let newEmpLName = answers.employeeLastName;
-    console.log("Employee Manager is ", answers.employeeManager);
+    //console.log("Employee Manager is ", answers.employeeManager);
 
     db.query(`SELECT id FROM role WHERE title = ('${answers.employeeRole}')`, (err, res) => {
       if (err) {
         console.log(err);
       }
       var newEmpRole_id = res[0].id;
-      console.log("Employee Role Id :", newEmpRole_id);
+      //console.log("Employee Role Id :", newEmpRole_id);
 
 
       db.query(`SELECT id FROM employee WHERE concat(first_name, " ", last_name) = ('${answers.employeeManager}')`, (err, result) => {
         if (err) {
           console.log(err);
         }
-        console.log(result);
+        //console.log(result);
         var newMgrRole_id = result[0].id;
-        console.log("Manager Id: ", newMgrRole_id);
+        //console.log("Manager Id: ", newMgrRole_id);
 
 
         db.query(`INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES ('${newEmpFName}', '${newEmpLName}', '${newEmpRole_id}', '${newMgrRole_id}')`, (err, result) => {
@@ -310,7 +310,7 @@ function updateEmpRole() {
     for (let index = 0; index < res.length; index++) {
       empName.push(res[index].first_name + " " + res[index].last_name );
     }
-    console.log(empName);
+    //console.log(empName);
 
     var query2 = `SELECT title FROM role`
     db.query(query2, function (err, result) {
@@ -322,7 +322,7 @@ function updateEmpRole() {
       for (let index = 0; index < result.length; index++) {
         empRole.push(result[index].title);
       }
-      console.log(empRole);
+      //console.log(empRole);
 
       promptForUpdatingEmployeeRole(empName, empRole);
 
@@ -349,22 +349,22 @@ function updateEmpRole() {
   ]).then((answers)=> {
     let employeeName = answers.employeeName;
     let employeeRole = answers.employeeRole;
-    console.log("Employee name: ",employeeName);
-    console.log("Employee role: ",employeeRole);
+    //console.log("Employee name: ",employeeName);
+    //console.log("Employee role: ",employeeRole);
     db.query(`SELECT id FROM role WHERE title = ("${answers.employeeRole}")`, (err, res) => {
       if (err) {
         console.log(err);
       }
       var newEmpRole_id = res[0].id;
-      console.log("Employee Role Id :", newEmpRole_id);
+     // console.log("Employee Role Id :", newEmpRole_id);
 
       db.query(`SELECT id FROM employee WHERE CONCAT(first_name, " ", last_name) = ('${answers.employeeName}')`, (err, result) => {
         if (err) {
           console.log(err);
         }
-        console.log(result);
+        //console.log(result);
         var empId = result[0].id;
-        console.log("Employee Id: ", empId);
+       // console.log("Employee Id: ", empId);
 
         var query = `UPDATE employee SET role_id = ? WHERE id = ?`
         db.query(query,[newEmpRole_id,empId], (err,result)=> {
@@ -383,10 +383,6 @@ function updateEmpRole() {
   })
 
 }
-
-
-
-
 
 app.use((req, res) => {
   res.status(404).end();
