@@ -300,7 +300,7 @@ function promptForAddingEmployee(empRole, empMngr) {
 
 function updateEmpRole() {
 
-  var query1 = `SELECT first_name, last_name, FROM employee `
+  var query1 = `SELECT first_name, last_name FROM employee`
   db.query(query1, function (err, res) {
     if (err) {
       console.log('Error while fetching  data');
@@ -308,7 +308,7 @@ function updateEmpRole() {
     }
     var empName = [];
     for (let index = 0; index < res.length; index++) {
-      empName.push(res[index].title);
+      empName.push(res[index].first_name + " " + res[index].last_name );
     }
     console.log(empName);
 
@@ -333,6 +333,54 @@ function updateEmpRole() {
 }
 
  function promptForUpdatingEmployeeRole(empName, empRole) {
+   inquirer.prompt ([
+    {
+      type: "list",
+      name: "employeeName",
+      message: "Which employee do you want to change the role? ",
+      choices: empName,
+    },
+    {
+      type: "list",
+      name: "employeeRole",
+      message: "Select the new Role:  ",
+      choices: empRole,
+    }  
+  ]).then((answers)=> {
+    let employeeName = answers.employeeName;
+    let employeeRole = answers.employeeRole;
+    console.log("Employee name: ",employeeName);
+    console.log("Employee role: ",employeeRole);
+    db.query(`SELECT id FROM role WHERE title = ("${answers.employeeRole}")`, (err, res) => {
+      if (err) {
+        console.log(err);
+      }
+      var newEmpRole_id = res[0].id;
+      console.log("Employee Role Id :", newEmpRole_id);
+
+      db.query(`SELECT id FROM employee WHERE CONCAT(first_name, " ", last_name) = ('${answers.employeeName}')`, (err, result) => {
+        if (err) {
+          console.log(err);
+        }
+        console.log(result);
+        var empId = result[0].id;
+        console.log("Employee Id: ", empId);
+
+        var query = `UPDATE employee SET role_id = ? WHERE id = ?`
+        db.query(query,[newEmpRole_id,empId], (err,result)=> {
+          if (err) {
+            console.log(err);
+          }
+          console.log("Updated the Information");
+          mainPrompt();
+
+        })
+
+      })
+
+    })
+
+  })
 
 }
 
