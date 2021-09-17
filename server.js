@@ -180,26 +180,26 @@ function promptForAddingRole(empdept) {
     console.log(newRole);
     console.log(newSalary);
     console.log(dept);
-    db.query(`SELECT id FROM department WHERE name = ('${answer.dept}')`,  (err, result) =>{
+    db.query(`SELECT id FROM department WHERE name = ('${answer.dept}')`, (err, result) => {
       if (err) {
         console.log(err);
       }
-      
+
       console.log(result);
       const deptid = result[0].id;
       console.log(deptid);
 
-    
 
-    db.query(`INSERT INTO role (title,salary,department_id) VALUES ('${newRole}', '${newSalary}','${deptid}')`, (err, result) => {
-      if (err) {
-        console.log(err);
-      }
-      console.log("ROW added sucessfully");
-      //console.table(result);
-      mainPrompt();
-    })
-  } );
+
+      db.query(`INSERT INTO role (title,salary,department_id) VALUES ('${newRole}', '${newSalary}','${deptid}')`, (err, result) => {
+        if (err) {
+          console.log(err);
+        }
+        console.log("ROW added sucessfully");
+        //console.table(result);
+        mainPrompt();
+      })
+    });
   })
 }
 
@@ -272,39 +272,32 @@ function promptForAddingEmployee(empRole, empMngr) {
         console.log(err);
       }
       var newEmpRole_id = res[0].id;
-      console.log("Employee Role Id :",newEmpRole_id);
-    
+      console.log("Employee Role Id :", newEmpRole_id);
 
-    db.query(`SELECT id FROM employee WHERE concat(first_name, " ", last_name) = ('${answers.employeeManager}')`, (err, result) => {
-      if (err) {
-        console.log(err);
-      }
-      console.log(result);
-      var newMgrRole_id = result[0].id;
-      console.log("Manager Id: ",newMgrRole_id);
-     
 
-    db.query(`INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES ('${newEmpFName}', '${newEmpLName}', '${newEmpRole_id}', '${newMgrRole_id}')`, (err, result) => {
-      if (err) {
-        console.log(err);
-      }
-      console.log("ROW added sucessfully");
-      //console.table(result);
-      mainPrompt();
-    })
-  });
-});
+      db.query(`SELECT id FROM employee WHERE concat(first_name, " ", last_name) = ('${answers.employeeManager}')`, (err, result) => {
+        if (err) {
+          console.log(err);
+        }
+        console.log(result);
+        var newMgrRole_id = result[0].id;
+        console.log("Manager Id: ", newMgrRole_id);
+
+
+        db.query(`INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES ('${newEmpFName}', '${newEmpLName}', '${newEmpRole_id}', '${newMgrRole_id}')`, (err, result) => {
+          if (err) {
+            console.log(err);
+          }
+          console.log("ROW added sucessfully");
+          //console.table(result);
+          mainPrompt();
+        })
+      });
+    });
 
   })
 
 }
-
-
-
-
-
-
-
 
 
 
