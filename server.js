@@ -145,8 +145,8 @@ function addRole() {
 
     const empdept = [];
     for (let index = 0; index < res.length; index++) {
-      empdept.push(res[index].id + ' ' + res[index].name);
-      
+      empdept.push(res[index].name);
+
     }
     //console.log(empdept);
     promptForAddingRole(empdept)
@@ -174,27 +174,36 @@ function promptForAddingRole(empdept) {
     let newRole = answer.role;
     let newSalary = answer.salary;
     let dept = answer.dept;
-    let dept1 = dept.slice(0,1);
     console.log(newRole);
     console.log(newSalary);
-    console.log(dept1);
-  
-    db.query(`INSERT INTO role (title,salary,department_id) VALUES ('${newRole}', '${newSalary}','${dept1}')`, (err, result) => {
+    console.log(dept);
+    db.query(`SELECT id FROM department WHERE name = ('${answer.dept}')`,  (err, result) =>{
+      if (err) {
+        console.log(err);
+      }
+      
+      console.log(result);
+      const deptid = result[0].id;
+      console.log(deptid);
+
+    
+
+    db.query(`INSERT INTO role (title,salary,department_id) VALUES ('${newRole}', '${newSalary}','${deptid}')`, (err, result) => {
       if (err) {
         console.log(err);
       }
       console.log("ROW added sucessfully");
       //console.table(result);
-    mainPrompt();
+      mainPrompt();
     })
-   
+  } );
   })
 }
 
 
 function addEmployee() {
 
-  var query1= `SELECT department_id , title FROM role`
+  var query1 = `SELECT department_id , title FROM role`
   db.query(query1, function (err, res) {
     if (err) {
       console.log('Error while fetching role data');
@@ -203,86 +212,98 @@ function addEmployee() {
     var empRole = [];
     for (let index = 0; index < res.length; index++) {
       empRole.push(res[index].title);
-      }
-      console.log(empRole)
-  
-  var query2= `SELECT  id , first_name, last_name FROM employee`
-  db.query(query2, function (err, res) {
-    if (err) {
-      console.log('Error while fetching role data');
-      return;
     }
-    var empMngr = [];
-    for (let index = 0; index < res.length; index++) {
-      empMngr.push(res[index].first_name + ' '+ res[index].last_name);
+    console.log(empRole)
+
+    var query2 = `SELECT  id , first_name, last_name FROM employee`
+    db.query(query2, function (err, res) {
+      if (err) {
+        console.log('Error while fetching role data');
+        return;
+      }
+      var empMngr = [];
+      for (let index = 0; index < res.length; index++) {
+        empMngr.push(res[index].first_name + ' ' + res[index].last_name);
       }
       console.log(empMngr)
-  
- promptForAddingRole(empRole,empMngr)
- 
-});
-});
+
+      promptForAddingEmployee(empRole, empMngr)
+
+    });
+  });
 }
 
-function promptForAddingRole(empRole,empMngr) {
-   inquirer.prompt([
-     {
-    type: "input",
-    name: "employeeFirstName",
-    message: "What is employee's first Name?"
-  },
-  {
-    type: "input",
-    name: "employeeLastName",
-    message: "What is employee's last Name?"
-  },
-  {
-    type: "list",
-    name: "employeeRole",
-    message: "What is employee's role?",
-    choices: empRole,
-  },
-   {
-    type: "list",
-    name: "employeeManager",
-    message: "Who is employee's Manager?",
-    choices: empMngr,
-  },
+function promptForAddingEmployee(empRole, empMngr) {
+  inquirer.prompt([
+    {
+      type: "input",
+      name: "employeeFirstName",
+      message: "What is employee's first Name?"
+    },
+    {
+      type: "input",
+      name: "employeeLastName",
+      message: "What is employee's last Name?"
+    },
+    {
+      type: "list",
+      name: "employeeRole",
+      message: "What is employee's role?",
+      choices: empRole,
+    },
+    {
+      type: "list",
+      name: "employeeManager",
+      message: "Who is employee's Manager?",
+      choices: empMngr,
+    },
 
   ]).then((answers) => {
 
     let newEmpFName = answers.employeeFirstName;
     let newEmpLName = answers.employeeLastName;
     console.log("Employee Manager is ", answers.employeeManager);
-    db.query(`SELECT department_id FROM role WHERE title = ('${answers.employeeRole}')`,(err, result) =>{
+
+    db.query(`SELECT department_id FROM role WHERE title = ('${answers.employeeRole}')`, (err, result) => {
       if (err) {
         console.log(err);
       }
-      
-      var newEmpRole_id = result; 
+      var newEmpRole_id = result;
       console.log(newEmpRole_id);
-    } );
+    
 
-    db.query(`SELECT id FROM employee WHERE concat(first_name, " ", last_name) = ('${answers.employeeManager}')`,(err, result) => {
+    db.query(`SELECT id FROM employee WHERE concat(first_name, " ", last_name) = ('${answers.employeeManager}')`, (err, result) => {
       if (err) {
         console.log(err);
       }
       console.log(result);
-      var newMgrRole_id = result; 
+      var newMgrRole_id = result;
       console.log(newMgrRole_id);
-    } );
-db.query(`INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES ('${newEmpFName}', '${newEmpLName}', '${newEmpRole_id}', '${newMgrRole_id}')`, (err, result) => {
-  if (err) {
-    console.log(err);
-  }
-  console.log("ROW added sucessfully");
-  //console.table(result);
-mainPrompt();
-})
+    
+
+    db.query(`INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES ('${newEmpFName}', '${newEmpLName}', '${newEmpRole_id}')`, (err, result) => {
+      if (err) {
+        console.log(err);
+      }
+      console.log("ROW added sucessfully");
+      //console.table(result);
+      mainPrompt();
+    })
+  });
+});
 
   })
 
 }
+
+
+
+
+
+
+
+
+
 
 
 app.use((req, res) => {
