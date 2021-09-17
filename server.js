@@ -67,7 +67,10 @@ function mainPrompt() {
 }
 // Function for viewing All Department
 function viewAllDept() {
-  db.query(`SELECT id, name as department FROM department`, function (err, result) {
+  db.query(`SELECT B.id,B.title,B.salary,A.name AS Department,B.Department_id 
+            FROM department AS A 
+            JOIN role AS B 
+            ON A.id = B.department_id;`, function (err, result) {
     if (err) {
       console.log(err);
     }
@@ -264,12 +267,12 @@ function promptForAddingEmployee(empRole, empMngr) {
     let newEmpLName = answers.employeeLastName;
     console.log("Employee Manager is ", answers.employeeManager);
 
-    db.query(`SELECT department_id FROM role WHERE title = ('${answers.employeeRole}')`, (err, result) => {
+    db.query(`SELECT id FROM role WHERE title = ('${answers.employeeRole}')`, (err, res) => {
       if (err) {
         console.log(err);
       }
-      var newEmpRole_id = result;
-      console.log(newEmpRole_id);
+      var newEmpRole_id = res[0].id;
+      console.log("Employee Role Id :",newEmpRole_id);
     
 
     db.query(`SELECT id FROM employee WHERE concat(first_name, " ", last_name) = ('${answers.employeeManager}')`, (err, result) => {
@@ -277,11 +280,11 @@ function promptForAddingEmployee(empRole, empMngr) {
         console.log(err);
       }
       console.log(result);
-      var newMgrRole_id = result;
-      console.log(newMgrRole_id);
-    
+      var newMgrRole_id = result[0].id;
+      console.log("Manager Id: ",newMgrRole_id);
+     
 
-    db.query(`INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES ('${newEmpFName}', '${newEmpLName}', '${newEmpRole_id}')`, (err, result) => {
+    db.query(`INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES ('${newEmpFName}', '${newEmpLName}', '${newEmpRole_id}', '${newMgrRole_id}')`, (err, result) => {
       if (err) {
         console.log(err);
       }
