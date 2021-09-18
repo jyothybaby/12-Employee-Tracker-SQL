@@ -9,7 +9,7 @@ const db = mysql.createConnection(
   {
     host: 'localhost',
     user: 'root',
-    password: 'Jyothysql2021',
+    password: '********',
     database: 'employeetracker_db'
   },
   console.log(`Connected to the employeetracker_db database.`)
