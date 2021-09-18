@@ -2,13 +2,8 @@
 const express = require('express');
 const mysql = require('mysql2');
 const inquirer = require("inquirer");
+const disp = require("console.table");
 
-
-const PORT = process.env.PORT || 3001;
-const app = express();
-
-app.use(express.urlencoded({ extended: false }));
-app.use(express.json());
 //Connecting to the Database
 const db = mysql.createConnection(
   {
@@ -21,25 +16,23 @@ const db = mysql.createConnection(
 );
 
 
-const empRole = [db.query(`SELECT title FROM role`)];
-
 function init() {
   mainPrompt();
 }
-
+// function for the main prompt for the menu
 function mainPrompt() {
   inquirer.prompt([{
     type: "list",
     name: "mainChoice",
     message: "What would like to do?",
     choices: ["View All Departments",
-              "View All Roles",
-              "View All Employees",
-              "Add Department",
-              "add a role",
-              "add an employee",
-              "update an employee role",
-              "Quit"]
+      "View All Roles",
+      "View All Employees",
+      "Add Department",
+      "add a role",
+      "add an employee",
+      "update an employee role",
+      "Quit"]
   }
   ]).then((userChoice) => {
     switch (userChoice.mainChoice) {
@@ -59,6 +52,9 @@ function mainPrompt() {
         break;
       case "Quit": db.end();
         break;
+      default:
+        console.log("something went wrong, Please Check your code");
+        break;
 
     }
   })
@@ -77,7 +73,6 @@ function viewAllDept() {
 
 
 //  Function for viewing all roles
-
 function viewAllRoles() {
   db.query(`SELECT A.id, A.title, A.salary, B.name AS Department, A.department_id
             FROM role AS A
@@ -111,7 +106,7 @@ function viewAllEmployee() {
   });
 }
 
-//Add Department
+//Function for adding a Department
 
 function addDept() {
   inquirer.prompt([{
@@ -134,7 +129,7 @@ function addDept() {
 }
 
 
-// For adding Role
+// Function for adding a Role
 function addRole() {
   var query =
     `SELECT id , name FROM department`
@@ -148,7 +143,7 @@ function addRole() {
       empdept.push(res[index].name);
 
     }
-     promptForAddingRole(empdept)
+    promptForAddingRole(empdept)
   })
 }
 function promptForAddingRole(empdept) {
@@ -173,13 +168,13 @@ function promptForAddingRole(empdept) {
     let newRole = answer.role;
     let newSalary = answer.salary;
     let dept = answer.dept;
-    
+
     db.query(`SELECT id FROM department WHERE name = ('${answer.dept}')`, (err, result) => {
       if (err) {
         console.log(err);
       }
       const deptid = result[0].id;
-     
+
       db.query(`INSERT INTO role (title,salary,department_id) VALUES ('${newRole}', '${newSalary}','${deptid}')`, (err, result) => {
         if (err) {
           console.log(err);
@@ -191,7 +186,7 @@ function promptForAddingRole(empdept) {
   })
 }
 
-
+//Function for adding an employee
 function addEmployee() {
 
   var query1 = `SELECT department_id , title FROM role`
@@ -258,10 +253,10 @@ function promptForAddingEmployee(empRole, empMngr) {
         if (err) {
           console.log(err);
         }
-        
+
         var newMgrRole_id = result[0].id;
 
-         db.query(`INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES ('${newEmpFName}', '${newEmpLName}', '${newEmpRole_id}', '${newMgrRole_id}')`, (err, result) => {
+        db.query(`INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES ('${newEmpFName}', '${newEmpLName}', '${newEmpRole_id}', '${newMgrRole_id}')`, (err, result) => {
           if (err) {
             console.log(err);
           }
@@ -274,7 +269,7 @@ function promptForAddingEmployee(empRole, empMngr) {
   })
 
 }
-
+//Function for updating a role
 function updateEmpRole() {
 
   var query1 = `SELECT first_name, last_name FROM employee`
@@ -285,7 +280,7 @@ function updateEmpRole() {
     }
     var empName = [];
     for (let index = 0; index < res.length; index++) {
-      empName.push(res[index].first_name + " " + res[index].last_name );
+      empName.push(res[index].first_name + " " + res[index].last_name);
     }
     var query2 = `SELECT title FROM role`
     db.query(query2, function (err, result) {
@@ -305,8 +300,8 @@ function updateEmpRole() {
 
 }
 
- function promptForUpdatingEmployeeRole(empName, empRole) {
-   inquirer.prompt ([
+function promptForUpdatingEmployeeRole(empName, empRole) {
+  inquirer.prompt([
     {
       type: "list",
       name: "employeeName",
@@ -318,8 +313,8 @@ function updateEmpRole() {
       name: "employeeRole",
       message: "Select the new Role:  ",
       choices: empRole,
-    }  
-  ]).then((answers)=> {
+    }
+  ]).then((answers) => {
     let employeeName = answers.employeeName;
     let employeeRole = answers.employeeRole;
     db.query(`SELECT id FROM role WHERE title = ("${answers.employeeRole}")`, (err, res) => {
@@ -331,12 +326,12 @@ function updateEmpRole() {
         if (err) {
           console.log(err);
         }
-        
+
         var empId = result[0].id;
-       
+
 
         var query = `UPDATE employee SET role_id = ? WHERE id = ?`
-        db.query(query,[newEmpRole_id,empId], (err,result)=> {
+        db.query(query, [newEmpRole_id, empId], (err, result) => {
           if (err) {
             console.log(err);
           }
@@ -352,11 +347,7 @@ function updateEmpRole() {
   })
 
 }
-
-app.use((req, res) => {
-  res.status(404).end();
-});
-
+// Initail function for the start
 init();
 
 
